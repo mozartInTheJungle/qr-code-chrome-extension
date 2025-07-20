@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">📱</div>
+            <h1>QR Code Generator</h1>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Generating QR code...</p>
+        </div>
+
+        <!-- QR Code Section -->
+        <div id="qr-section" class="qr-section hidden">
+            <div class="qr-container">
+                <canvas id="qr-canvas" width="256" height="256"></canvas>
+                <div class="logo-overlay" id="logo-overlay">
+                    <img id="website-logo" src="" alt="Website Logo" />
+                </div>
+            </div>
+            
+            <!-- Website Information -->
+            <div class="website-info">
+                <div class="website-name" id="website-name">Loading...</div>
+                <div class="website-title" id="website-title">Loading page title...</div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button id="save-btn" class="btn btn-primary">
+                    💾 Save QR Code
+                </button>
+                <button id="copy-btn" class="btn btn-secondary">
+                    📋 Copy URL
+                </button>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="error-section hidden">
+            <div class="error-icon">⚠️</div>
+            <h3>Unable to generate QR code</h3>
+            <p id="error-message">Please try again on a valid webpage.</p>
+            <button id="retry-btn" class="btn btn-primary">Retry</button>
+        </div>
+    </div>
+
+    <!-- QR Code Generation Library -->
+    <script src="qrcode.min.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html> 

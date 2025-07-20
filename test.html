@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Extension Test Page</title>
+    <meta name="description" content="Test page for QR Code Chrome Extension">
+    <meta property="og:title" content="QR Code Test">
+    <meta property="og:site_name" content="Test Site">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .test-urls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .test-url {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        .test-url:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: #667eea;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">T</div>
+        <h1>QR Code Extension Test Page</h1>
+        <p>Perfect for testing your Chrome extension!</p>
+    </div>
+
+    <div class="instructions">
+        <h2>🧪 How to Test</h2>
+        <ol>
+            <li><strong>Load the Extension:</strong> Make sure your QR Code Generator extension is loaded in Chrome</li>
+            <li><strong>Click the Extension Icon:</strong> Look for the QR code icon in your Chrome toolbar</li>
+            <li><strong>Expected Result:</strong> You should see:
+                <ul>
+                    <li>A 256×256 QR code</li>
+                    <li>Website logo in the center (🧪 test tube emoji as favicon)</li>
+                    <li>Website name: "Test Site"</li>
+                    <li>Page title: "QR Code Extension Test Page"</li>
+                </ul>
+            </li>
+            <li><strong>Debug Issues:</strong> Right-click the extension icon → "Inspect" to see console logs</li>
+        </ol>
+    </div>
+
+    <h2>🌐 More Test URLs</h2>
+    <p>Try the extension on these different websites to test various scenarios:</p>
+    
+    <div class="test-urls">
+        <a href="https://example.com" target="_blank" class="test-url">
+            <strong>Example.com</strong><br>
+            <small>Simple site with basic favicon</small>
+        </a>
+        <a href="https://github.com" target="_blank" class="test-url">
+            <strong>GitHub</strong><br>
+            <small>Rich metadata and high-quality logo</small>
+        </a>
+        <a href="https://stackoverflow.com" target="_blank" class="test-url">
+            <strong>Stack Overflow</strong><br>
+            <small>Good OpenGraph data</small>
+        </a>
+        <a href="https://www.google.com" target="_blank" class="test-url">
+            <strong>Google</strong><br>
+            <small>Well-known site with clean metadata</small>
+        </a>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #e8f4fd; border-radius: 8px;">
+        <h3>📋 Expected Features</h3>
+        <ul>
+            <li>✅ QR code size: 256 × 256 pixels</li>
+            <li>✅ Logo in center of QR code</li>
+            <li>✅ Website name displayed below QR code</li>
+            <li>✅ Page title in bold (max 15 words)</li>
+            <li>✅ Save QR code as PNG</li>
+            <li>✅ Copy URL to clipboard</li>
+        </ul>
+    </div>
+
+    <script>
+        // Add some basic page info for testing
+        console.log('Test page loaded');
+        console.log('Page title:', document.title);
+        console.log('Page URL:', window.location.href);
+        
+        // Simulate some dynamic content for testing
+        setTimeout(() => {
+            console.log('Page fully loaded - ready for QR code generation');
+        }, 1000);
+    </script>
+</body>
+</html> 

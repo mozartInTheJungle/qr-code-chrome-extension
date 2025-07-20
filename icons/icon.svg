@@ -1,0 +1,72 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="qr-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main background -->
+  <rect width="128" height="128" rx="24" fill="url(#bg-gradient)"/>
+  
+  <!-- QR Code Container -->
+  <rect x="16" y="16" width="96" height="96" rx="12" fill="url(#qr-gradient)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  
+  <!-- QR Code Pattern -->
+  <!-- Top-left corner -->
+  <rect x="24" y="24" width="24" height="24" rx="2" fill="#1a1a1a"/>
+  <rect x="28" y="28" width="16" height="16" rx="1" fill="url(#qr-gradient)"/>
+  <rect x="32" y="32" width="8" height="8" rx="1" fill="#1a1a1a"/>
+  
+  <!-- Top-right corner -->
+  <rect x="80" y="24" width="24" height="24" rx="2" fill="#1a1a1a"/>
+  <rect x="84" y="28" width="16" height="16" rx="1" fill="url(#qr-gradient)"/>
+  <rect x="88" y="32" width="8" height="8" rx="1" fill="#1a1a1a"/>
+  
+  <!-- Bottom-left corner -->
+  <rect x="24" y="80" width="24" height="24" rx="2" fill="#1a1a1a"/>
+  <rect x="28" y="84" width="16" height="16" rx="1" fill="url(#qr-gradient)"/>
+  <rect x="32" y="88" width="8" height="8" rx="1" fill="#1a1a1a"/>
+  
+  <!-- Data pattern dots -->
+  <rect x="56" y="24" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="64" y="24" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="72" y="24" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  
+  <rect x="24" y="56" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="32" y="56" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="40" y="56" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  
+  <rect x="56" y="32" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="64" y="40" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="72" y="48" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  
+  <rect x="56" y="56" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="80" y="56" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="88" y="64" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  
+  <rect x="56" y="72" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="64" y="80" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="72" y="88" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  
+  <rect x="96" y="72" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="88" y="80" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  <rect x="80" y="88" width="4" height="4" rx="1" fill="#1a1a1a"/>
+  
+  <!-- Center logo placeholder -->
+  <circle cx="64" cy="64" r="10" fill="url(#qr-gradient)" stroke="#667eea" stroke-width="2"/>
+  <circle cx="64" cy="64" r="4" fill="#667eea"/>
+  
+  <!-- Subtle shadow -->
+  <defs>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  <rect x="16" y="16" width="96" height="96" rx="12" fill="none" filter="url(#shadow)"/>
+</svg> 
