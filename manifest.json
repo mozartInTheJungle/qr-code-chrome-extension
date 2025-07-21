@@ -9,11 +9,6 @@
     "tabs"
   ],
   
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
-  ],
-  
   "action": {
     "default_title": "QR Code Generator - Click floating logo on page to generate QR code"
   },
@@ -34,13 +29,6 @@
       "matches": [
         "http://*/*",
         "https://*/*"
-      ],
-      "exclude_matches": [
-        "chrome://*/*",
-        "chrome-extension://*/*",
-        "moz-extension://*/*",
-        "about:*/*",
-        "file://*/*"
       ],
       "js": ["qrcode.min.js", "content.js"],
       "css": ["content.css"],
