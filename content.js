@@ -1,45 +1,65 @@
 /**
- * QR Code Generator - Content Script v2.0
+ * QR Code Generator - Content Script v2.0 (Debug Version)
  * Creates floating logo and QR code overlay functionality
  */
 
+// Immediate debug log
+console.log('🔍 QR Generator: Content script loaded!', {
+    url: window.location.href,
+    readyState: document.readyState,
+    QRCodeAvailable: typeof QRCode !== 'undefined'
+});
+
 class QRFloatingWidget {
     constructor() {
+        console.log('🔍 QR Generator: QRFloatingWidget constructor called');
+        
         this.pageInfo = null;
         this.floatingLogo = null;
         this.overlay = null;
         this.isOverlayVisible = false;
         this.qrCanvas = null;
         
-        this.init();
+        // Add a small delay to ensure QRCode library is loaded
+        setTimeout(() => {
+            console.log('🔍 QR Generator: Delayed init, QRCode available:', typeof QRCode !== 'undefined');
+            this.init();
+        }, 100);
     }
 
     async init() {
         try {
+            console.log('🔍 QR Generator: Starting init...');
+            
             // Skip on restricted pages
             if (this.isRestrictedPage()) {
-                console.log('QR Generator: Skipping restricted page');
+                console.log('🔍 QR Generator: Skipping restricted page:', window.location.href);
                 return;
             }
 
-            console.log('QR Generator: Initializing floating widget...');
+            console.log('🔍 QR Generator: Initializing floating widget...');
             
             // Extract page information
             this.pageInfo = this.extractPageInfo();
-            console.log('QR Generator: Page info extracted:', this.pageInfo);
+            console.log('🔍 QR Generator: Page info extracted:', this.pageInfo);
             
             // Create floating logo
+            console.log('🔍 QR Generator: Creating floating logo...');
             this.createFloatingLogo();
+            console.log('🔍 QR Generator: Floating logo created, element:', this.floatingLogo);
             
             // Wait a bit then show the logo
             setTimeout(() => {
                 if (this.floatingLogo) {
+                    console.log('🔍 QR Generator: Making logo visible');
                     this.floatingLogo.style.opacity = '1';
+                } else {
+                    console.error('🔍 QR Generator: Logo element is null!');
                 }
             }, 500);
             
         } catch (error) {
-            console.error('QR Generator: Error initializing widget:', error);
+            console.error('🔍 QR Generator: Error initializing widget:', error);
         }
     }
 
@@ -53,9 +73,12 @@ class QRFloatingWidget {
             'file://'
         ];
         
-        return restrictedPrefixes.some(prefix => url.startsWith(prefix)) ||
+        const isRestricted = restrictedPrefixes.some(prefix => url.startsWith(prefix)) ||
                url === 'about:blank' ||
                url === '';
+               
+        console.log('🔍 QR Generator: Page restriction check:', { url, isRestricted });
+        return isRestricted;
     }
 
     extractPageInfo() {
@@ -152,60 +175,122 @@ class QRFloatingWidget {
     }
 
     createFloatingLogo() {
-        // Remove existing logo if any
-        if (this.floatingLogo) {
-            this.floatingLogo.remove();
-        }
-
-        this.floatingLogo = document.createElement('div');
-        this.floatingLogo.className = 'qr-floating-logo';
-        this.floatingLogo.style.opacity = '0';
-        this.floatingLogo.setAttribute('title', 'Click to generate QR code for this page');
-        this.floatingLogo.setAttribute('role', 'button');
-        this.floatingLogo.setAttribute('tabindex', '0');
-
-        // Create logo content
-        const logoContent = document.createElement('div');
-        logoContent.className = 'qr-logo-content';
-
-        // Try to load favicon
-        if (this.pageInfo.favicon) {
-            const logoImg = document.createElement('img');
-            logoImg.className = 'qr-logo-img';
-            logoImg.src = this.makeAbsoluteURL(this.pageInfo.favicon);
-            logoImg.alt = 'Website Logo';
+        try {
+            console.log('🔍 QR Generator: Creating floating logo element...');
             
-            logoImg.onload = () => {
-                logoContent.appendChild(logoImg);
-            };
-            
-            logoImg.onerror = () => {
-                this.createFallbackLogo(logoContent);
-            };
-        } else {
-            this.createFallbackLogo(logoContent);
-        }
-
-        this.floatingLogo.appendChild(logoContent);
-
-        // Add event listeners
-        this.floatingLogo.addEventListener('click', () => this.showQROverlay());
-        this.floatingLogo.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.showQROverlay();
+            // Remove existing logo if any
+            if (this.floatingLogo) {
+                console.log('🔍 QR Generator: Removing existing logo');
+                this.floatingLogo.remove();
             }
-        });
 
-        // Add to page
-        document.body.appendChild(this.floatingLogo);
+            // Check if body exists
+            if (!document.body) {
+                console.error('🔍 QR Generator: document.body is null!');
+                return;
+            }
+
+            this.floatingLogo = document.createElement('div');
+            this.floatingLogo.className = 'qr-floating-logo';
+            this.floatingLogo.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+                cursor: pointer;
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 3px solid rgba(255, 255, 255, 0.2);
+                user-select: none;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                opacity: 0;
+            `;
+            
+            this.floatingLogo.setAttribute('title', 'Click to generate QR code for this page');
+            this.floatingLogo.setAttribute('role', 'button');
+            this.floatingLogo.setAttribute('tabindex', '0');
+
+            console.log('🔍 QR Generator: Logo element created, adding content...');
+
+            // Create logo content
+            const logoContent = document.createElement('div');
+            logoContent.style.cssText = `
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.95);
+                box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            `;
+
+            // Always create fallback logo first (simpler)
+            this.createFallbackLogo(logoContent);
+
+            this.floatingLogo.appendChild(logoContent);
+
+            // Add event listeners
+            this.floatingLogo.addEventListener('click', () => {
+                console.log('🔍 QR Generator: Logo clicked!');
+                this.showQROverlay();
+            });
+            
+            this.floatingLogo.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    console.log('🔍 QR Generator: Logo activated via keyboard!');
+                    this.showQROverlay();
+                }
+            });
+
+            // Add to page
+            console.log('🔍 QR Generator: Adding logo to document.body...');
+            document.body.appendChild(this.floatingLogo);
+            
+            console.log('🔍 QR Generator: Logo added to DOM, checking if visible...');
+            
+            // Debug: Check if element is actually in DOM
+            setTimeout(() => {
+                const logoInDom = document.querySelector('.qr-floating-logo');
+                console.log('🔍 QR Generator: Logo in DOM check:', {
+                    logoInDom: !!logoInDom,
+                    styles: logoInDom ? {
+                        display: getComputedStyle(logoInDom).display,
+                        position: getComputedStyle(logoInDom).position,
+                        zIndex: getComputedStyle(logoInDom).zIndex,
+                        opacity: getComputedStyle(logoInDom).opacity,
+                        visibility: getComputedStyle(logoInDom).visibility
+                    } : 'none'
+                });
+            }, 100);
+            
+        } catch (error) {
+            console.error('🔍 QR Generator: Error creating floating logo:', error);
+        }
     }
 
     createFallbackLogo(container) {
+        console.log('🔍 QR Generator: Creating fallback logo text');
         const logoText = document.createElement('div');
-        logoText.className = 'qr-logo-text';
+        logoText.style.cssText = `
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            line-height: 1;
+        `;
         logoText.textContent = this.pageInfo.siteName.charAt(0).toUpperCase();
         container.appendChild(logoText);
+        console.log('🔍 QR Generator: Fallback logo created with text:', logoText.textContent);
     }
 
     makeAbsoluteURL(url) {
@@ -219,7 +304,15 @@ class QRFloatingWidget {
     }
 
     async showQROverlay() {
+        console.log('🔍 QR Generator: showQROverlay called');
         if (this.isOverlayVisible) return;
+
+        // Check if QRCode library is available
+        if (typeof QRCode === 'undefined') {
+            console.error('🔍 QR Generator: QRCode library not available!');
+            alert('QR Code library not loaded. Please reload the page and try again.');
+            return;
+        }
 
         try {
             // Create overlay
@@ -235,8 +328,8 @@ class QRFloatingWidget {
             this.showQRContent();
             
         } catch (error) {
-            console.error('QR Generator: Error showing overlay:', error);
-            this.showError('Failed to generate QR code');
+            console.error('🔍 QR Generator: Error showing overlay:', error);
+            this.showError('Failed to generate QR code: ' + error.message);
         }
     }
 
@@ -246,15 +339,60 @@ class QRFloatingWidget {
         }
 
         this.overlay = document.createElement('div');
-        this.overlay.className = 'qr-overlay';
+        this.overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        `;
 
         const overlayContent = document.createElement('div');
-        overlayContent.className = 'qr-overlay-content';
+        overlayContent.style.cssText = `
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 90vw;
+            max-height: 90vh;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        `;
 
         // Close button
         const closeBtn = document.createElement('button');
-        closeBtn.className = 'qr-close-btn';
         closeBtn.innerHTML = '×';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f5f5f7;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+            transition: all 0.2s ease;
+        `;
         closeBtn.setAttribute('title', 'Close');
         closeBtn.addEventListener('click', () => this.hideQROverlay());
 
@@ -279,36 +417,66 @@ class QRFloatingWidget {
 
         // Show overlay
         setTimeout(() => {
-            this.overlay.classList.add('qr-overlay-visible');
+            this.overlay.style.opacity = '1';
+            this.overlay.style.visibility = 'visible';
+            overlayContent.style.transform = 'scale(1) translateY(0)';
             this.isOverlayVisible = true;
         }, 10);
     }
 
     showLoading() {
-        const content = this.overlay.querySelector('.qr-overlay-content');
-        const closeBtn = content.querySelector('.qr-close-btn');
+        const content = this.overlay.querySelector('div');
+        const closeBtn = content.querySelector('button');
         
         content.innerHTML = '';
         content.appendChild(closeBtn);
 
         const loading = document.createElement('div');
-        loading.className = 'qr-loading';
-        loading.innerHTML = `
-            <div class="qr-spinner"></div>
-            <div class="qr-loading-text">Generating QR code...</div>
+        loading.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 40px;
         `;
-
+        
+        const spinner = document.createElement('div');
+        spinner.style.cssText = `
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        `;
+        
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Generating QR code...';
+        loadingText.style.cssText = `
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        `;
+        
+        // Add spin animation
+        const style = document.createElement('style');
+        style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
+        
+        loading.appendChild(spinner);
+        loading.appendChild(loadingText);
         content.appendChild(loading);
     }
 
     async generateQRCode() {
         return new Promise((resolve, reject) => {
             try {
+                console.log('🔍 QR Generator: Generating QR code for URL:', this.pageInfo.url);
+                
                 // Create canvas
                 this.qrCanvas = document.createElement('canvas');
                 this.qrCanvas.width = 256;
                 this.qrCanvas.height = 256;
-                this.qrCanvas.className = 'qr-code-canvas';
 
                 // Generate QR code using the loaded library
                 QRCode.toCanvas(this.qrCanvas, this.pageInfo.url, {
@@ -321,7 +489,7 @@ class QRFloatingWidget {
                     },
                     errorCorrectionLevel: 'H'
                 }).then(() => {
-                    console.log('QR Generator: QR code generated successfully');
+                    console.log('🔍 QR Generator: QR code generated successfully');
                     resolve();
                 }).catch(reject);
 
@@ -332,73 +500,74 @@ class QRFloatingWidget {
     }
 
     showQRContent() {
-        const content = this.overlay.querySelector('.qr-overlay-content');
-        const closeBtn = content.querySelector('.qr-close-btn');
+        const content = this.overlay.querySelector('div');
+        const closeBtn = content.querySelector('button');
         
         content.innerHTML = '';
         content.appendChild(closeBtn);
 
         // Header
         const header = document.createElement('div');
-        header.className = 'qr-overlay-header';
+        header.style.textAlign = 'center';
         header.innerHTML = `
-            <h2 class="qr-overlay-title">QR Code Generated</h2>
-            <p class="qr-overlay-subtitle">Scan to visit this page</p>
+            <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0;">QR Code Generated</h2>
+            <p style="font-size: 14px; color: #666; margin: 0;">Scan to visit this page</p>
         `;
 
         // QR Code container
         const qrContainer = document.createElement('div');
-        qrContainer.className = 'qr-code-container';
+        qrContainer.style.cssText = `
+            position: relative;
+            display: inline-block;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            padding: 8px;
+        `;
         qrContainer.appendChild(this.qrCanvas);
-
-        // Add logo overlay on QR code
-        if (this.pageInfo.favicon) {
-            const logoOverlay = document.createElement('div');
-            logoOverlay.className = 'qr-logo-overlay';
-            
-            const logoImg = document.createElement('img');
-            logoImg.src = this.makeAbsoluteURL(this.pageInfo.favicon);
-            logoImg.alt = 'Website Logo';
-            
-            logoImg.onload = () => {
-                logoOverlay.appendChild(logoImg);
-            };
-            
-            logoImg.onerror = () => {
-                // Create text fallback
-                const logoText = document.createElement('div');
-                logoText.style.cssText = `
-                    font-size: 18px;
-                    font-weight: 700;
-                    color: #667eea;
-                `;
-                logoText.textContent = this.pageInfo.siteName.charAt(0).toUpperCase();
-                logoOverlay.appendChild(logoText);
-            };
-            
-            qrContainer.appendChild(logoOverlay);
-        }
 
         // Website info
         const websiteInfo = document.createElement('div');
-        websiteInfo.className = 'qr-website-info';
+        websiteInfo.style.textAlign = 'center';
         websiteInfo.innerHTML = `
-            <div class="qr-website-name">${this.escapeHtml(this.pageInfo.siteName)}</div>
-            <div class="qr-website-title">${this.escapeHtml(this.limitWords(this.pageInfo.title, 15))}</div>
+            <div style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px;">${this.escapeHtml(this.pageInfo.siteName)}</div>
+            <div style="font-size: 14px; font-weight: 700; color: #444;">${this.escapeHtml(this.limitWords(this.pageInfo.title, 15))}</div>
         `;
 
         // Action buttons
         const actions = document.createElement('div');
-        actions.className = 'qr-actions';
+        actions.style.cssText = 'display: flex; gap: 12px; width: 100%; max-width: 300px;';
         
         const saveBtn = document.createElement('button');
-        saveBtn.className = 'qr-btn qr-btn-primary';
         saveBtn.innerHTML = '💾 Save QR Code';
+        saveBtn.style.cssText = `
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        `;
         saveBtn.addEventListener('click', () => this.saveQRCode());
 
         const copyBtn = document.createElement('button');
-        copyBtn.className = 'qr-btn qr-btn-secondary';
         copyBtn.innerHTML = '📋 Copy URL';
+        copyBtn.style.cssText = `
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid #e5e5e7;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #f5f5f7;
+            color: #1a1a1a;
+        `;
         copyBtn.addEventListener('click', () => this.copyURL());
 
         actions.appendChild(saveBtn);
@@ -412,19 +581,19 @@ class QRFloatingWidget {
     }
 
     showError(message) {
-        const content = this.overlay.querySelector('.qr-overlay-content');
-        const closeBtn = content.querySelector('.qr-close-btn');
+        const content = this.overlay.querySelector('div');
+        const closeBtn = content.querySelector('button');
         
         content.innerHTML = '';
         content.appendChild(closeBtn);
 
         const error = document.createElement('div');
-        error.className = 'qr-error';
+        error.style.cssText = 'text-align: center; padding: 40px; color: #d73a49;';
         error.innerHTML = `
-            <div class="qr-error-icon">⚠️</div>
-            <h3 class="qr-error-title">Unable to generate QR code</h3>
-            <p class="qr-error-message">${this.escapeHtml(message)}</p>
-            <button class="qr-btn qr-btn-primary" onclick="location.reload()">Retry</button>
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Unable to generate QR code</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 16px;">${this.escapeHtml(message)}</p>
+            <button onclick="location.reload()" style="padding: 12px 24px; border: none; border-radius: 12px; background: #667eea; color: white; cursor: pointer;">Retry</button>
         `;
 
         content.appendChild(error);
@@ -433,7 +602,8 @@ class QRFloatingWidget {
     hideQROverlay() {
         if (!this.isOverlayVisible) return;
 
-        this.overlay.classList.remove('qr-overlay-visible');
+        this.overlay.style.opacity = '0';
+        this.overlay.style.visibility = 'hidden';
         this.isOverlayVisible = false;
 
         setTimeout(() => {
@@ -446,40 +616,15 @@ class QRFloatingWidget {
 
     saveQRCode() {
         try {
-            // Create composite canvas with QR code and logo
-            const compositeCanvas = document.createElement('canvas');
-            compositeCanvas.width = 256;
-            compositeCanvas.height = 256;
-            const ctx = compositeCanvas.getContext('2d');
-
-            // Draw QR code
-            ctx.drawImage(this.qrCanvas, 0, 0);
-
-            // Draw logo if available
-            const logoOverlay = this.overlay.querySelector('.qr-logo-overlay img');
-            if (logoOverlay && logoOverlay.complete) {
-                const logoSize = 32;
-                const logoX = (256 - logoSize) / 2;
-                const logoY = (256 - logoSize) / 2;
-                
-                // Draw white background for logo
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(logoX - 8, logoY - 8, logoSize + 16, logoSize + 16);
-                
-                // Draw logo
-                ctx.drawImage(logoOverlay, logoX, logoY, logoSize, logoSize);
-            }
-
-            // Download
             const link = document.createElement('a');
             link.download = `qr-code-${this.formatDomainName(window.location.hostname)}.png`;
-            link.href = compositeCanvas.toDataURL();
+            link.href = this.qrCanvas.toDataURL();
             link.click();
 
             this.showToast('QR code saved successfully!');
 
         } catch (error) {
-            console.error('QR Generator: Error saving QR code:', error);
+            console.error('🔍 QR Generator: Error saving QR code:', error);
             this.showToast('Failed to save QR code', 'error');
         }
     }
@@ -489,13 +634,12 @@ class QRFloatingWidget {
             await navigator.clipboard.writeText(this.pageInfo.url);
             this.showToast('URL copied to clipboard!');
         } catch (error) {
-            console.error('QR Generator: Error copying URL:', error);
+            console.error('🔍 QR Generator: Error copying URL:', error);
             this.showToast('Failed to copy URL', 'error');
         }
     }
 
     showToast(message, type = 'success') {
-        // Remove existing toast
         const existingToast = document.querySelector('.qr-toast');
         if (existingToast) {
             existingToast.remove();
@@ -517,25 +661,13 @@ class QRFloatingWidget {
             font-size: 14px;
             font-weight: 500;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            animation: qr-toast-in 0.3s ease;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         `;
-
-        // Add animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes qr-toast-in {
-                from { opacity: 0; transform: translate(-50%, -20px); }
-                to { opacity: 1; transform: translate(-50%, 0); }
-            }
-        `;
-        document.head.appendChild(style);
 
         document.body.appendChild(toast);
 
         setTimeout(() => {
             toast.remove();
-            style.remove();
         }, 3000);
     }
 
@@ -557,11 +689,32 @@ class QRFloatingWidget {
     }
 }
 
-// Initialize the widget when page loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+// Multiple initialization methods to ensure it runs
+console.log('🔍 QR Generator: Setting up initialization...');
+
+function initializeWidget() {
+    console.log('🔍 QR Generator: initializeWidget called, document ready state:', document.readyState);
+    try {
         new QRFloatingWidget();
-    });
+    } catch (error) {
+        console.error('🔍 QR Generator: Error in initializeWidget:', error);
+    }
+}
+
+// Try different initialization approaches
+if (document.readyState === 'loading') {
+    console.log('🔍 QR Generator: Document still loading, waiting for DOMContentLoaded');
+    document.addEventListener('DOMContentLoaded', initializeWidget);
 } else {
-    new QRFloatingWidget();
-} 
+    console.log('🔍 QR Generator: Document already loaded, initializing immediately');
+    // Small delay to ensure everything is ready
+    setTimeout(initializeWidget, 50);
+}
+
+// Backup initialization
+setTimeout(() => {
+    if (!document.querySelector('.qr-floating-logo')) {
+        console.log('🔍 QR Generator: Backup initialization triggered');
+        initializeWidget();
+    }
+}, 1000); 
