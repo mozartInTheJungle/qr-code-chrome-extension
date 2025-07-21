@@ -689,9 +689,72 @@ class QRFloatingWidget {
 
     saveQRCode() {
         try {
+            // Create composite canvas with QR code and logo
+            const compositeCanvas = document.createElement('canvas');
+            compositeCanvas.width = 200;
+            compositeCanvas.height = 200;
+            const ctx = compositeCanvas.getContext('2d');
+
+            // Draw QR code
+            ctx.drawImage(this.qrCanvas, 0, 0);
+
+            // Get the logo overlay element
+            const logoOverlay = this.overlay.querySelector('div[style*="position: absolute"]');
+            
+            if (logoOverlay) {
+                // Create a temporary canvas to draw the logo
+                const logoCanvas = document.createElement('canvas');
+                logoCanvas.width = 40;
+                logoCanvas.height = 40;
+                const logoCtx = logoCanvas.getContext('2d');
+
+                // Draw white background circle
+                logoCtx.fillStyle = '#ffffff';
+                logoCtx.beginPath();
+                logoCtx.arc(20, 20, 20, 0, 2 * Math.PI);
+                logoCtx.fill();
+
+                // Try to get the logo image or text
+                const logoImg = logoOverlay.querySelector('img');
+                const logoText = logoOverlay.querySelector('div');
+
+                if (logoImg && logoImg.complete) {
+                    // Draw logo image
+                    logoCtx.save();
+                    logoCtx.beginPath();
+                    logoCtx.arc(20, 20, 14, 0, 2 * Math.PI);
+                    logoCtx.clip();
+                    logoCtx.drawImage(logoImg, 6, 6, 28, 28);
+                    logoCtx.restore();
+                } else if (logoText) {
+                    // Draw logo text
+                    logoCtx.fillStyle = '#667eea';
+                    logoCtx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                    logoCtx.textAlign = 'center';
+                    logoCtx.textBaseline = 'middle';
+                    logoCtx.fillText(logoText.textContent, 20, 20);
+                }
+
+                // Add shadow effect
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 2;
+
+                // Draw logo overlay on QR code
+                ctx.drawImage(logoCanvas, 80, 80, 40, 40);
+
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+            }
+
+            // Download the composite image
             const link = document.createElement('a');
             link.download = `qr-code-${this.formatDomainName(window.location.hostname)}.png`;
-            link.href = this.qrCanvas.toDataURL();
+            link.href = compositeCanvas.toDataURL();
             link.click();
 
             this.showToast('QR code saved successfully!');
