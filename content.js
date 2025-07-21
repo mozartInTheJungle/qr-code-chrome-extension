@@ -689,6 +689,8 @@ class QRFloatingWidget {
 
     saveQRCode() {
         try {
+            console.log('🔍 QR Generator: Starting QR code save...');
+            
             // Create composite canvas with QR code and logo
             const compositeCanvas = document.createElement('canvas');
             compositeCanvas.width = 200;
@@ -697,71 +699,150 @@ class QRFloatingWidget {
 
             // Draw QR code
             ctx.drawImage(this.qrCanvas, 0, 0);
+            console.log('🔍 QR Generator: QR code drawn to canvas');
 
-            // Get the logo overlay element
-            const logoOverlay = this.overlay.querySelector('div[style*="position: absolute"]');
+            // Try multiple ways to find the logo overlay
+            let logoOverlay = null;
             
-            if (logoOverlay) {
-                // Create a temporary canvas to draw the logo
-                const logoCanvas = document.createElement('canvas');
-                logoCanvas.width = 40;
-                logoCanvas.height = 40;
-                const logoCtx = logoCanvas.getContext('2d');
-
-                // Draw white background circle
-                logoCtx.fillStyle = '#ffffff';
-                logoCtx.beginPath();
-                logoCtx.arc(20, 20, 20, 0, 2 * Math.PI);
-                logoCtx.fill();
-
-                // Try to get the logo image or text
-                const logoImg = logoOverlay.querySelector('img');
-                const logoText = logoOverlay.querySelector('div');
-
-                if (logoImg && logoImg.complete) {
-                    // Draw logo image
-                    logoCtx.save();
-                    logoCtx.beginPath();
-                    logoCtx.arc(20, 20, 14, 0, 2 * Math.PI);
-                    logoCtx.clip();
-                    logoCtx.drawImage(logoImg, 6, 6, 28, 28);
-                    logoCtx.restore();
-                } else if (logoText) {
-                    // Draw logo text
-                    logoCtx.fillStyle = '#667eea';
-                    logoCtx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-                    logoCtx.textAlign = 'center';
-                    logoCtx.textBaseline = 'middle';
-                    logoCtx.fillText(logoText.textContent, 20, 20);
+            // Method 1: Look for the logo overlay by its position and size
+            const allDivs = this.overlay.querySelectorAll('div');
+            for (const div of allDivs) {
+                const style = window.getComputedStyle(div);
+                if (style.position === 'absolute' && 
+                    (style.width === '40px' || style.width === '40px') &&
+                    (style.height === '40px' || style.height === '40px')) {
+                    logoOverlay = div;
+                    console.log('🔍 QR Generator: Found logo overlay by size/position');
+                    break;
                 }
-
-                // Add shadow effect
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
-                ctx.shadowBlur = 6;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 2;
-
-                // Draw logo overlay on QR code
-                ctx.drawImage(logoCanvas, 80, 80, 40, 40);
-
-                // Reset shadow
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
+            }
+            
+            // Method 2: If not found, try to create logo from page info
+            if (!logoOverlay) {
+                console.log('🔍 QR Generator: Logo overlay not found, creating from page info');
+                this.addLogoToSavedQR(ctx);
+            } else {
+                // Method 3: Use the found logo overlay
+                this.drawLogoFromOverlay(ctx, logoOverlay);
             }
 
             // Download the composite image
             const link = document.createElement('a');
             link.download = `qr-code-${this.formatDomainName(window.location.hostname)}.png`;
             link.href = compositeCanvas.toDataURL();
+            
+            console.log('🔍 QR Generator: Triggering download...');
             link.click();
 
             this.showToast('QR code saved successfully!');
 
         } catch (error) {
             console.error('🔍 QR Generator: Error saving QR code:', error);
-            this.showToast('Failed to save QR code', 'error');
+            this.showToast('Failed to save QR code: ' + error.message, 'error');
+        }
+    }
+
+    drawLogoFromOverlay(ctx, logoOverlay) {
+        try {
+            // Create a temporary canvas to draw the logo
+            const logoCanvas = document.createElement('canvas');
+            logoCanvas.width = 40;
+            logoCanvas.height = 40;
+            const logoCtx = logoCanvas.getContext('2d');
+
+            // Draw white background circle
+            logoCtx.fillStyle = '#ffffff';
+            logoCtx.beginPath();
+            logoCtx.arc(20, 20, 20, 0, 2 * Math.PI);
+            logoCtx.fill();
+
+            // Try to get the logo image or text
+            const logoImg = logoOverlay.querySelector('img');
+            const logoText = logoOverlay.querySelector('div');
+
+            if (logoImg && logoImg.complete) {
+                console.log('🔍 QR Generator: Drawing logo image');
+                // Draw logo image
+                logoCtx.save();
+                logoCtx.beginPath();
+                logoCtx.arc(20, 20, 14, 0, 2 * Math.PI);
+                logoCtx.clip();
+                logoCtx.drawImage(logoImg, 6, 6, 28, 28);
+                logoCtx.restore();
+            } else if (logoText) {
+                console.log('🔍 QR Generator: Drawing logo text:', logoText.textContent);
+                // Draw logo text
+                logoCtx.fillStyle = '#667eea';
+                logoCtx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                logoCtx.textAlign = 'center';
+                logoCtx.textBaseline = 'middle';
+                logoCtx.fillText(logoText.textContent, 20, 20);
+            }
+
+            // Add shadow effect
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 2;
+
+            // Draw logo overlay on QR code
+            ctx.drawImage(logoCanvas, 80, 80, 40, 40);
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            console.log('🔍 QR Generator: Logo drawn to QR code');
+        } catch (error) {
+            console.error('🔍 QR Generator: Error drawing logo from overlay:', error);
+            // Fallback to simple logo
+            this.addLogoToSavedQR(ctx);
+        }
+    }
+
+    addLogoToSavedQR(ctx) {
+        try {
+            console.log('🔍 QR Generator: Adding fallback logo to saved QR');
+            
+            // Create a temporary canvas to draw the logo
+            const logoCanvas = document.createElement('canvas');
+            logoCanvas.width = 40;
+            logoCanvas.height = 40;
+            const logoCtx = logoCanvas.getContext('2d');
+
+            // Draw white background circle
+            logoCtx.fillStyle = '#ffffff';
+            logoCtx.beginPath();
+            logoCtx.arc(20, 20, 20, 0, 2 * Math.PI);
+            logoCtx.fill();
+
+            // Draw logo text (first letter of site name)
+            logoCtx.fillStyle = '#667eea';
+            logoCtx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            logoCtx.textAlign = 'center';
+            logoCtx.textBaseline = 'middle';
+            logoCtx.fillText(this.pageInfo.siteName.charAt(0).toUpperCase(), 20, 20);
+
+            // Add shadow effect
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 2;
+
+            // Draw logo overlay on QR code
+            ctx.drawImage(logoCanvas, 80, 80, 40, 40);
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            console.log('🔍 QR Generator: Fallback logo added to QR code');
+        } catch (error) {
+            console.error('🔍 QR Generator: Error adding fallback logo:', error);
         }
     }
 
