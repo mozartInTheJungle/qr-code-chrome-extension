@@ -1,23 +1,17 @@
 {
   "manifest_version": 3,
   "name": "QR Code Generator",
-  "version": "1.0.0",
-  "description": "Generate QR codes for any webpage with website logo and information",
+  "version": "1.1.0",
+  "description": "Generate QR codes for any webpage with floating website logo and overlay display",
   
   "permissions": [
     "activeTab",
-    "tabs"
+    "tabs",
+    "scripting"
   ],
   
   "action": {
-    "default_popup": "popup.html",
-    "default_title": "Generate QR Code",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
+    "default_title": "QR Code Generator - Click floating logo on page to generate QR code"
   },
   
   "icons": {
@@ -34,8 +28,16 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "js": ["qrcode.min.js", "content.js"],
+      "css": ["content.css"],
       "run_at": "document_end"
+    }
+  ],
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.png", "qrcode.min.js"],
+      "matches": ["<all_urls>"]
     }
   ]
 } 
