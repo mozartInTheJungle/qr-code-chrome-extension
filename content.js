@@ -347,30 +347,32 @@ class QRFloatingWidget {
             height: 100vh;
             background: rgba(0, 0, 0, 0.8);
             z-index: 10001;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: block;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            pointer-events: auto;
         `;
 
         const overlayContent = document.createElement('div');
         overlayContent.style.cssText = `
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
             background: #ffffff;
             border-radius: 24px;
-            padding: 32px;
-            max-width: 90vw;
-            max-height: 90vh;
+            padding: 24px;
+            width: 320px;
+            max-height: 80vh;
             box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 24px;
+            gap: 20px;
             transform: scale(0.8) translateY(20px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            overflow-y: auto;
         `;
 
         // Close button
@@ -378,10 +380,10 @@ class QRFloatingWidget {
         closeBtn.innerHTML = '×';
         closeBtn.style.cssText = `
             position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 32px;
-            height: 32px;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
             border: none;
             background: #f5f5f7;
             border-radius: 50%;
@@ -389,9 +391,10 @@ class QRFloatingWidget {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             color: #666;
             transition: all 0.2s ease;
+            z-index: 1;
         `;
         closeBtn.setAttribute('title', 'Close');
         closeBtn.addEventListener('click', () => this.hideQROverlay());
@@ -475,13 +478,13 @@ class QRFloatingWidget {
                 
                 // Create canvas
                 this.qrCanvas = document.createElement('canvas');
-                this.qrCanvas.width = 256;
-                this.qrCanvas.height = 256;
+                this.qrCanvas.width = 200;
+                this.qrCanvas.height = 200;
 
                 // Generate QR code using the loaded library
                 QRCode.toCanvas(this.qrCanvas, this.pageInfo.url, {
-                    width: 256,
-                    height: 256,
+                    width: 200,
+                    height: 200,
                     margin: 2,
                     color: {
                         dark: '#000000',
@@ -510,8 +513,8 @@ class QRFloatingWidget {
         const header = document.createElement('div');
         header.style.textAlign = 'center';
         header.innerHTML = `
-            <h2 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 8px 0;">QR Code Generated</h2>
-            <p style="font-size: 14px; color: #666; margin: 0;">Scan to visit this page</p>
+            <h2 style="font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 0 0 6px 0;">QR Code</h2>
+            <p style="font-size: 13px; color: #666; margin: 0;">Scan to visit this page</p>
         `;
 
         // QR Code container
@@ -537,16 +540,16 @@ class QRFloatingWidget {
 
         // Action buttons
         const actions = document.createElement('div');
-        actions.style.cssText = 'display: flex; gap: 12px; width: 100%; max-width: 300px;';
+        actions.style.cssText = 'display: flex; gap: 10px; width: 100%;';
         
         const saveBtn = document.createElement('button');
-        saveBtn.innerHTML = '💾 Save QR Code';
+        saveBtn.innerHTML = '💾 Save';
         saveBtn.style.cssText = `
             flex: 1;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -556,13 +559,13 @@ class QRFloatingWidget {
         saveBtn.addEventListener('click', () => this.saveQRCode());
 
         const copyBtn = document.createElement('button');
-        copyBtn.innerHTML = '📋 Copy URL';
+        copyBtn.innerHTML = '📋 Copy';
         copyBtn.style.cssText = `
             flex: 1;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: 1px solid #e5e5e7;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             background: #f5f5f7;
