@@ -6,8 +6,12 @@
   
   "permissions": [
     "activeTab",
-    "tabs",
-    "scripting"
+    "tabs"
+  ],
+  
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
   ],
   
   "action": {
@@ -27,7 +31,17 @@
   
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "exclude_matches": [
+        "chrome://*/*",
+        "chrome-extension://*/*",
+        "moz-extension://*/*",
+        "about:*/*",
+        "file://*/*"
+      ],
       "js": ["qrcode.min.js", "content.js"],
       "css": ["content.css"],
       "run_at": "document_end"
@@ -37,7 +51,10 @@
   "web_accessible_resources": [
     {
       "resources": ["icons/*.png", "qrcode.min.js"],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
     }
   ]
 } 

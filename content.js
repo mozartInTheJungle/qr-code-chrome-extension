@@ -909,4 +909,42 @@ setTimeout(() => {
         console.log('🔍 QR Generator: Backup initialization triggered');
         initializeWidget();
     }
-}, 1000); 
+}, 1000);
+
+// Listen for messages from background script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('🔍 QR Generator: Received message:', request);
+    
+    if (request.action === 'showInstructions') {
+        // Show instruction toast
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            z-index: 10002;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            text-align: center;
+            max-width: 300px;
+        `;
+        toast.innerHTML = '👀 Look for the floating logo in the bottom-right corner to generate QR codes!';
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 4000);
+        
+        sendResponse({ success: true });
+    }
+    
+    return true; // Keep message channel open for async response
+}); 

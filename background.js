@@ -34,36 +34,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Handle action button click - show instructions since we now use floating logo
 chrome.action.onClicked.addListener((tab) => {
-    // Inject a simple instruction notification
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => {
-            // Show instruction toast
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #667eea;
-                color: white;
-                padding: 16px 24px;
-                border-radius: 12px;
-                z-index: 10002;
-                font-size: 14px;
-                font-weight: 500;
-                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                text-align: center;
-                max-width: 300px;
-            `;
-            toast.innerHTML = '👀 Look for the floating logo in the bottom-right corner to generate QR codes!';
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 4000);
+    // Send a message to the content script to show instructions
+    // This avoids needing the scripting permission
+    chrome.tabs.sendMessage(tab.id, { action: 'showInstructions' }, (response) => {
+        if (chrome.runtime.lastError) {
+            console.log('QR Generator: Could not send instruction message:', chrome.runtime.lastError.message);
         }
     });
 });
