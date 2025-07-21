@@ -607,13 +607,13 @@ class QRFloatingWidget {
         actions.style.cssText = 'display: flex; gap: 10px; width: 100%;';
         
         const saveBtn = document.createElement('button');
-        saveBtn.innerHTML = '💾 Save';
+        saveBtn.innerHTML = '💾 Save QR Code';
         saveBtn.style.cssText = `
             flex: 1;
             padding: 10px 16px;
             border: none;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -623,13 +623,13 @@ class QRFloatingWidget {
         saveBtn.addEventListener('click', () => this.saveQRCode());
 
         const copyBtn = document.createElement('button');
-        copyBtn.innerHTML = '📋 Copy';
+        copyBtn.innerHTML = '📋 Copy URL';
         copyBtn.style.cssText = `
             flex: 1;
             padding: 10px 16px;
             border: 1px solid #e5e5e7;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             background: #f5f5f7;
