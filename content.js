@@ -293,6 +293,67 @@ class QRFloatingWidget {
         console.log('🔍 QR Generator: Fallback logo created with text:', logoText.textContent);
     }
 
+    addLogoToQRCode(qrContainer) {
+        const logoOverlay = document.createElement('div');
+        logoOverlay.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid #ffffff;
+            overflow: hidden;
+        `;
+
+        // Try to load favicon first
+        if (this.pageInfo.favicon) {
+            const logoImg = document.createElement('img');
+            logoImg.style.cssText = `
+                width: 28px;
+                height: 28px;
+                object-fit: cover;
+                border-radius: 50%;
+            `;
+            logoImg.src = this.makeAbsoluteURL(this.pageInfo.favicon);
+            logoImg.alt = 'Website Logo';
+            
+            logoImg.onload = () => {
+                console.log('🔍 QR Generator: Logo image loaded for QR overlay');
+                logoOverlay.appendChild(logoImg);
+            };
+            
+            logoImg.onerror = () => {
+                console.log('🔍 QR Generator: Logo image failed, using fallback text for QR overlay');
+                this.createFallbackLogoForQR(logoOverlay);
+            };
+        } else {
+            console.log('🔍 QR Generator: No favicon found, using fallback text for QR overlay');
+            this.createFallbackLogoForQR(logoOverlay);
+        }
+
+        qrContainer.appendChild(logoOverlay);
+    }
+
+    createFallbackLogoForQR(container) {
+        const logoText = document.createElement('div');
+        logoText.style.cssText = `
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            line-height: 1;
+        `;
+        logoText.textContent = this.pageInfo.siteName.charAt(0).toUpperCase();
+        container.appendChild(logoText);
+    }
+
     makeAbsoluteURL(url) {
         if (!url) return null;
         
@@ -361,15 +422,15 @@ class QRFloatingWidget {
             bottom: 90px;
             right: 20px;
             background: #ffffff;
-            border-radius: 24px;
-            padding: 24px;
-            width: 320px;
+            border-radius: 20px;
+            padding: 16px;
+            width: 280px;
             max-height: 80vh;
             box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             transform: scale(0.8) translateY(20px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
@@ -522,20 +583,23 @@ class QRFloatingWidget {
         qrContainer.style.cssText = `
             position: relative;
             display: inline-block;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             background: #fff;
-            padding: 8px;
+            padding: 4px;
         `;
         qrContainer.appendChild(this.qrCanvas);
+
+        // Add logo overlay on QR code
+        this.addLogoToQRCode(qrContainer);
 
         // Website info
         const websiteInfo = document.createElement('div');
         websiteInfo.style.textAlign = 'center';
         websiteInfo.innerHTML = `
-            <div style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px;">${this.escapeHtml(this.pageInfo.siteName)}</div>
-            <div style="font-size: 14px; font-weight: 700; color: #444;">${this.escapeHtml(this.limitWords(this.pageInfo.title, 15))}</div>
+            <div style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">${this.escapeHtml(this.pageInfo.siteName)}</div>
+            <div style="font-size: 13px; font-weight: 500; color: #666;">${this.escapeHtml(this.limitWords(this.pageInfo.title, 15))}</div>
         `;
 
         // Action buttons
