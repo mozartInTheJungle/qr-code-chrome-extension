@@ -139,7 +139,7 @@ class QRFloatingWidget {
 
     getLinkHref(rel, additionalSelector = '') {
         const selector = additionalSelector 
-            ? `link[rel="${rel}"]${additionalSelector}`
+            ? `link[rel="${rel}"][${additionalSelector}]`
             : `link[rel="${rel}"]`;
         
         const link = document.querySelector(selector);
