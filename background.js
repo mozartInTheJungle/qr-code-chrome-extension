@@ -34,13 +34,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Handle action button click - show instructions since we now use floating logo
 chrome.action.onClicked.addListener((tab) => {
-    // Send a message to the content script to show instructions
-    // This avoids needing the scripting permission
-    chrome.tabs.sendMessage(tab.id, { action: 'showInstructions' }, (response) => {
-        if (chrome.runtime.lastError) {
-            console.log('QR Generator: Could not send instruction message:', chrome.runtime.lastError.message);
-        }
-    });
+    // Since we removed tabs permission, we can't send messages to content scripts
+    // The floating logo is already visible on the page, so no action needed
+    console.log('QR Generator: Action button clicked - floating logo should already be visible');
 });
 
 // Keep service worker alive (if needed for future features)

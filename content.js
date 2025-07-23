@@ -911,7 +911,7 @@ setTimeout(() => {
     }
 }, 1000);
 
-// Listen for messages from background script
+// Listen for messages from background script (kept for future use)
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('🔍 QR Generator: Received message:', request);
     
@@ -947,4 +947,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     
     return true; // Keep message channel open for async response
-}); 
+});
+
+ 
